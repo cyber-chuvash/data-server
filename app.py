@@ -4,6 +4,9 @@ from datetime import datetime
 
 import aiohttp.web
 
+from server import config
+from server import database
+
 
 routes = aiohttp.web.RouteTableDef()
 
@@ -45,8 +48,12 @@ async def post_data(request):
     return aiohttp.web.Response(status=200, text='ok')
 
 
-def create_app(*args):
+def create_app(*args, config_file=None):
     app = aiohttp.web.Application()
+
+    app['config_file'] = config_file
+    app.on_startup.append(config.on_startup)
+    app.cleanup_ctx.append(database.cleanup_ctx)
 
     app.add_routes(routes)
 
@@ -57,10 +64,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-H', '--host', default='127.0.0.1')
     parser.add_argument('-P', '--port', default=8080, type=int)
+    parser.add_argument('-c', '--config-file', default=None)
 
     args = parser.parse_args()
 
-    aiohttp.web.run_app(create_app(), host=args.host, port=args.port)
+    aiohttp.web.run_app(create_app(args.config_file), host=args.host, port=args.port)
 
 
 if __name__ == '__main__':
