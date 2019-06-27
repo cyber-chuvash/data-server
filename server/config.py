@@ -67,5 +67,6 @@ class _Config:
     __getattr__ = __getitem__
 
 
-async def on_startup(app):
+async def cleanup_ctx(app):
     app['config'] = _Config(app['config_file'])
+    yield

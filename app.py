@@ -52,7 +52,7 @@ def create_app(*args, config_file=None):
     app = aiohttp.web.Application()
 
     app['config_file'] = config_file
-    app.on_startup.append(config.on_startup)
+    app.cleanup_ctx.append(config.cleanup_ctx)
     app.cleanup_ctx.append(database.cleanup_ctx)
 
     app.add_routes(routes)
@@ -68,7 +68,7 @@ def main():
 
     args = parser.parse_args()
 
-    aiohttp.web.run_app(create_app(args.config_file), host=args.host, port=args.port)
+    aiohttp.web.run_app(create_app(config_file=args.config_file), host=args.host, port=args.port)
 
 
 if __name__ == '__main__':
