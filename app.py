@@ -11,7 +11,7 @@ from server import database
 routes = aiohttp.web.RouteTableDef()
 
 
-@routes.post('/data/{table}')
+@routes.post('/data')
 async def post_data(request):
     # Check that request has a JSON body
     if not (request.content_type == 'application/json' and request.can_read_body):
@@ -41,9 +41,9 @@ async def post_data(request):
     except ValueError:
         raise aiohttp.web.HTTPBadRequest from None
 
-    table = request.match_info['table']
-
-    print(f'[{table}] {timestamp.isoformat()}: {value}')
+    db = request.app['pg']
+    async with db.cursor() as cur:
+        await cur.execute('INSERT INTO data VALUES (%s, %s);', (timestamp, value))
 
     return aiohttp.web.Response(status=200, text='ok')
 
