@@ -10,6 +10,7 @@ RUN pip install --no-cache-dir --prefix /install -r /requirements.txt
 
 
 FROM base
+RUN apk update && apk add --no-cache libpq
 COPY --from=builder /install /usr/local
 COPY server/ /app/server/
 COPY app.py /app/
