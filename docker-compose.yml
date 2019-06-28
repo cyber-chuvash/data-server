@@ -1,0 +1,33 @@
+version: "3.7"
+
+services:
+  data-server:
+    image: cyberchuvash/data-server:latest
+    restart: unless-stopped
+    hostname: data-server
+    depends_on:
+      - postgres
+    volumes:
+      - "./config.ini:/etc/data-server/config.ini"
+    environment:
+      CONFIG_FILE: /etc/data-server/config.ini
+    networks:
+      - datanet
+    ports:
+      - "127.0.0.1:8070:80"
+
+  postgres:
+    image: postgres:11.4-alpine
+    restart: unless-stopped
+    volumes:
+      - "data:/var/lib/postgresql/data"
+    env_file:
+      - postgres.env
+    networks:
+      - datanet
+
+volumes:
+  data:
+
+networks:
+  datanet:
