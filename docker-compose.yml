@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   data-server:
-    image: cyberchuvash/data-server:latest
+    image: cyberchuvash/dataserver:latest
     restart: unless-stopped
     hostname: data-server
     depends_on:

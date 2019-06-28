@@ -1,0 +1,26 @@
+sudo: required
+
+services:
+  - docker
+
+if: tag IS present
+
+env:
+  global:
+    - REGISTRY_USER=cyberchuvash
+
+before_script:
+  - docker pull cyberchuvash/dataserver:latest || true
+
+script:
+  - docker build --pull --cache-from cyberchuvash/dataserver:latest --tag cyberchuvash/dataserver:latest .
+  - docker tag cyberchuvash/dataserver:latest cyberchuvash/dataserver:$TRAVIS_TAG
+
+before_deploy:
+  - docker login -u "$REGISTRY_USER" -p "$REGISTRY_PASS"
+
+deploy:
+  provider: script
+  script: docker push cyberchuvash/dataserver
+  on:
+    tags: true
