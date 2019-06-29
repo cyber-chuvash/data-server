@@ -21,6 +21,7 @@ class _Config:
     CONF_FIELDS = {
         'base': {
             'log_level': str,
+            'access_tokens': str.split
         },
 
         'database': {

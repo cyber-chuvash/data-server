@@ -17,6 +17,11 @@ async def post_data(request):
     if not (request.content_type == 'application/json' and request.can_read_body):
         raise aiohttp.web.HTTPBadRequest
 
+    token = request.headers.get('Authorization')
+    if not (token and token.split()[0] == 'CrapToken'
+            and token.split()[1] in request.app['config'].base.access_tokens):
+        raise aiohttp.web.HTTPUnauthorized
+
     try:
         data = (await request.json())['data']
     except (json.JSONDecodeError, KeyError):
