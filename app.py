@@ -1,10 +1,12 @@
 import json
+import logging
 import argparse
 from datetime import datetime
 
 import aiohttp.web
 
 from server import config
+from server import logger
 from server import database
 
 
@@ -56,8 +58,10 @@ async def post_data(request):
 def create_app(*args, config_file=None):
     app = aiohttp.web.Application()
 
+    # Order is important
     app['config_file'] = config_file
     app.cleanup_ctx.append(config.cleanup_ctx)
+    app.on_startup.append(logger.on_startup)
     app.cleanup_ctx.append(database.cleanup_ctx)
 
     app.add_routes(routes)
@@ -72,8 +76,9 @@ def main():
     parser.add_argument('-c', '--config-file', default=None)
 
     args = parser.parse_args()
+    log = logging.getLogger('data-server')
 
-    aiohttp.web.run_app(create_app(config_file=args.config_file), host=args.host, port=args.port)
+    aiohttp.web.run_app(create_app(config_file=args.config_file), host=args.host, port=args.port, access_log=log)
 
 
 if __name__ == '__main__':
